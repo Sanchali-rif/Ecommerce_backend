@@ -12,7 +12,7 @@ export const isUserAuthenticated = async (req,res,next) =>{
     const token = rawToken.split("Bearer ")[1];
 
     if(!token){
-        res.json({
+        return res.json({
             message:"User is not authenticated",
         });
     };
@@ -21,7 +21,7 @@ export const isUserAuthenticated = async (req,res,next) =>{
     try {
         decoded.data = jwt.verify(token, process.env.JWT_SECRET);
     }catch (error) {
-        res.json({
+        return res.json({
             message:"Not a valid Token",
         });
     }
