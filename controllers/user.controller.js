@@ -30,3 +30,17 @@ export const handleRegisterUser = async (req,res) =>{
         "message":"User created!"
     });
 }
+
+export const handleLoginUser = async(req,res)=>{
+    const{email,password}=req.body;
+
+    const user=await User.findOne({
+        email: email
+    });
+
+    if(!user){
+        return res.json({
+            message:"User not found"
+        })
+    }
+}
