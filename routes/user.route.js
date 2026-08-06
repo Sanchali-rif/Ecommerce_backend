@@ -10,7 +10,7 @@ console.log("user.route.js loaded");
 userRouter.post("/register",handleRegisterUser);
 
 userRouter.post("/login", handleLoginUser);
-userRouter.post("/logout",isUserAuthenticated,handleLogOut)
+userRouter.post("/logout",isUserAuthenticated,handleLogOut);
 
 userRouter.get("/me",isUserAuthenticated,(req,res)=>{
     const {email} = req;
@@ -18,9 +18,9 @@ userRouter.get("/me",isUserAuthenticated,(req,res)=>{
     res.json({
         message:"You are loged in",
         email:email
-    })
+    });
     
-})
+});
 
 
 
