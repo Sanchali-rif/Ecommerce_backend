@@ -49,11 +49,11 @@ export const createItem = async(req,res) =>{
     try{
         const{name,price,category}=req.body
         if(!name || !price || !category){
-            return res.status.json({
+            return res.json({
                 message:"name,price,category required"
             })
         }
-        const item=await item.create({
+        const item=await Items.create({
             name,
             price,
             category
