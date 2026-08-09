@@ -1,6 +1,6 @@
 import { Categories, Items } from "../models/item.model.js";
 
-export const createCategory = (req,res) =>{
+export const createCategory = async (req,res) =>{
     try{
         const{name}=req.body;
         if(!name){
@@ -30,8 +30,8 @@ export const createCategory = (req,res) =>{
     }
 }
 
-export const fetchCategory = (req,res) =>{
-    return null;
+export const fetchCategory = async(req,res) =>{
+    
     try{
         const categories=await Categories.find({})
         return res.json({
@@ -45,7 +45,7 @@ export const fetchCategory = (req,res) =>{
     }
 }
 
-export const createItem = (req,res) =>{
+export const createItem = async(req,res) =>{
     try{
         const{name,price,category}=req.body
         if(!name || !price || !category){
@@ -70,7 +70,7 @@ export const createItem = (req,res) =>{
     }
 }
 
-export const fetchAllItem = (req,res) =>{
+export const fetchAllItem = async(req,res) =>{
     try {
         const items = await Items.find({});
 
