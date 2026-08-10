@@ -12,7 +12,7 @@ export const authorizationMiddleware = (roles) =>{
         const role=user.role
 
         if (role=="RETAILER"){
-            next()
+            return next()
         }
         return res.json({
             message:"you are not authorized"
