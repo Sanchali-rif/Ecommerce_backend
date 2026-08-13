@@ -47,26 +47,50 @@ export const fetchCategory = async(req,res) =>{
 
 export const createItem = async(req,res) =>{
     try{
-        const{name,price,category}=req.body
+        const {name, price, category} = req.body;
+
         if(!name || !price || !category){
             return res.json({
                 message:"name,price,category required"
-            })
+            });
         }
-        const item=await Items.create({
+
+        // Check if category exists
+        const existingCategory = await Categories.findById(category);
+
+        if(!existingCategory){
+            return res.status(404).json({
+                message:"Category not found"
+            });
+        }
+
+        // Create item
+        const item = await Items.create({
             name,
             price,
             category
-        })
+        });
+
+        // Increase totalItem by 1
+        await Categories.findByIdAndUpdate(
+            category,
+            {
+                $inc: {
+                    totalItem: 1
+                }
+            }
+        );
+
         return res.json({
             message:"Item created",
             item
-        })
+        });
+
     }catch(error){
         return res.json({
             message:"server error",
             error:error.message
-        })
+        });
     }
 }
 
@@ -86,47 +110,95 @@ export const fetchAllItem = async(req,res) =>{
     }
 }
 
-export const updateItem = async (req,res)=>{
+export const updateItem = async (req,res) => {
     try{
         const {id} = req.params;
-        const item=await Items.findById(id)
-        if (!item) {
+
+        const item = await Items.findById(id);
+
+        if(!item){
             return res.json({
-                message: "Item not found"
+                message:"Item not found"
             });
         }
+
+        // Check if category is being changed
+        if(req.body.category && req.body.category !== item.category.toString()){
+
+            // Check new category exists
+            const newCategory = await Categories.findById(req.body.category);
+
+            if(!newCategory){
+                return res.status(404).json({
+                    message:"New category not found"
+                });
+            }
+
+            // Decrease old category count
+            await Categories.findByIdAndUpdate(
+                item.category,
+                {
+                    $inc:{
+                        totalItem:-1
+                    }
+                }
+            );
+
+            // Increase new category count
+            await Categories.findByIdAndUpdate(
+                req.body.category,
+                {
+                    $inc:{
+                        totalItem:1
+                    }
+                }
+            );
+        }
+
         const updatedItem = await Items.findByIdAndUpdate(
             id,
             { $set: req.body },
-            { new: true }
+            { new:true }
         );
 
         return res.json({
-            message: "Item updated successfully",
-            item: updatedItem
+            message:"Item updated successfully",
+            item:updatedItem
         });
 
-    } catch (error) {
+    }catch(error){
         return res.json({
-            message: "server error",
-            error: error.message
+            message:"server error",
+            error:error.message
         });
     }
-    
 }
 
 export const removeItem = async (req, res) => {
     try {
-    
         const { id } = req.params;
 
-        const item = await Items.findByIdAndDelete(id);
+        // Find item first
+        const item = await Items.findById(id);
 
         if (!item) {
             return res.status(404).json({
                 message: "Item not found"
             });
         }
+
+        // Delete item
+        await Items.findByIdAndDelete(id);
+
+        // Decrease category totalItem
+        await Categories.findByIdAndUpdate(
+            item.category,
+            {
+                $inc: {
+                    totalItem: -1
+                }
+            }
+        );
 
         return res.status(200).json({
             message: "Item deleted successfully"
